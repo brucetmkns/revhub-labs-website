@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services | RevHub Labs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lime: #b2ef63;
+            --lime-glow: rgba(178, 239, 99, 0.4);
+            --lime-dark: #9ad94f;
+            --black: #050505;
+            --dark: #0A0A0A;
+            --dark-elevated: #111111;
+            --dark-border: #1A1A1A;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-400: #888888;
+            --gray-600: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Gradient Orbs */
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--lime-glow), transparent 70%);
+            top: -200px;
+            right: -200px;
+            opacity: 0.3;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--lime-glow), transparent 70%);
+            bottom: 20%;
+            left: -150px;
+            opacity: 0.15;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.02em;
+        }
+
+        .logo-text span {
+            font-weight: 400;
+            color: var(--gray-400);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-400);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--lime);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--white);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            opacity: 1;
+        }
+
+        .nav-cta {
+            background: var(--lime);
+            color: var(--black);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--lime-glow);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--lime-glow);
+        }
+
+        /* Page Hero */
+        .page-hero {
+            padding: 10rem 0 6rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero > .container {
+            width: 100%;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            padding: 0.5rem 1rem 0.5rem 0.75rem;
+            border-radius: 100px;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease forwards;
+            width: fit-content;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--lime);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--lime-glow);
+        }
+
+        .hero-badge span {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.6s ease 0.1s forwards;
+            opacity: 0;
+        }
+
+        .page-hero h1 .highlight {
+            color: var(--lime);
+            text-shadow: 0 0 60px var(--lime-glow);
+        }
+
+        .page-hero-description {
+            font-size: 1.35rem;
+            color: var(--gray-400);
+            max-width: 700px;
+            line-height: 1.7;
+            font-weight: 400;
+            animation: fadeIn 0.6s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        /* Process Section */
+        .process-section {
+            padding: 4rem 0;
+            border-top: 1px solid var(--dark-border);
+            border-bottom: 1px solid var(--dark-border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .process-step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .process-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 50%;
+            font-weight: 700;
+            color: var(--lime);
+            margin-bottom: 1.5rem;
+        }
+
+        .process-step h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .process-step p {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+        }
+
+        .process-arrow {
+            display: none;
+        }
+
+        /* Service Sections */
+        .service-section {
+            padding: 6rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .service-section:nth-child(even) {
+            background: var(--dark);
+        }
+
+        .service-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        .service-header.reverse {
+            direction: rtl;
+        }
+
+        .service-header.reverse > * {
+            direction: ltr;
+        }
+
+        .service-icon-large {
+            width: 80px;
+            height: 80px;
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-icon-large svg {
+            color: var(--lime);
+            width: 36px;
+            height: 36px;
+        }
+
+        .service-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--lime);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .service-label::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: var(--lime);
+        }
+
+        .service-content h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .service-content > p {
+            font-size: 1.1rem;
+            color: var(--gray-400);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .service-visual {
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 24px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--lime-glow), transparent 60%);
+            opacity: 0.1;
+        }
+
+        .visual-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray-600);
+            position: relative;
+            z-index: 1;
+        }
+
+        .visual-placeholder svg {
+            width: 64px;
+            height: 64px;
+            opacity: 0.5;
+        }
+
+        /* Capabilities Grid */
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .capability-card {
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .capability-card:hover {
+            border-color: var(--lime);
+            transform: translateY(-4px);
+        }
+
+        .capability-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .capability-card h4::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--lime);
+            border-radius: 50%;
+        }
+
+        .capability-card p {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--lime-glow), transparent 60%);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .cta-section h2 .highlight {
+            color: var(--lime);
+        }
+
+        .cta-section > p {
+            color: var(--gray-400);
+            font-size: 1.15rem;
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            position: relative;
+        }
+
+        .btn-glow {
+            background: var(--lime);
+            color: var(--black);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px var(--lime-glow);
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px var(--lime-glow);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--dark-border);
+            padding: 4rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-brand p {
+            color: var(--gray-400);
+            font-size: 0.95rem;
+            margin-top: 1.5rem;
+            max-width: 280px;
+        }
+
+        .footer-col h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-col a {
+            color: var(--gray-400);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--lime);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--dark-border);
+        }
+
+        .footer-bottom p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-400);
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: var(--lime);
+            border-color: var(--lime);
+            color: var(--black);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .service-header {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .service-header.reverse {
+                direction: ltr;
+            }
+
+            .process-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 1.25rem;
+            }
+
+            .capabilities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/RevHub-icon.png" alt="RevHub Labs" class="logo-icon">
+                <div class="logo-text">RevHub <span>Labs</span></div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="services.html" class="active">Services</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <a href="contact.html" class="nav-cta">Book a Call</a>
+        </div>
+    </nav>
+
+    <section class="page-hero">
+        <div class="container">
+            <div class="hero-badge">
+                <div class="hero-badge-dot"></div>
+                <span>Our Services</span>
+            </div>
+            <h1>Four pillars of<br><span class="highlight">RevOps excellence</span></h1>
+            <p class="page-hero-description">Comprehensive revenue operations support, delivered as your embedded fractional team. We don't just consult—we execute.</p>
+        </div>
+    </section>
+
+    <section class="process-section">
+        <div class="container">
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="process-number">1</div>
+                    <h3>Analysis</h3>
+                    <p>We audit your current state to understand what's working and what isn't</p>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">2</div>
+                    <h3>Recommendations</h3>
+                    <p>We provide a prioritized roadmap based on impact and effort</p>
+                </div>
+                <div class="process-step">
+                    <div class="process-number">3</div>
+                    <h3>Integration</h3>
+                    <p>We implement and connect systems to create a unified revenue engine</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Section -->
+    <section class="service-section" id="data">
+        <div class="container">
+            <div class="service-header">
+                <div class="service-content">
+                    <div class="service-label">Service 01</div>
+                    <div class="service-icon-large">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18 9l-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <h2>Data</h2>
+                    <p>Visibility precedes velocity. We transform scattered metrics into unified visibility so you can see what's actually driving revenue—and what's just noise.</p>
+                </div>
+                <div class="service-visual">
+                    <div class="visual-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M3 3v18h18"/>
+                            <path d="M7 14l4-4 4 4 5-5"/>
+                            <circle cx="7" cy="14" r="1.5" fill="currentColor"/>
+                            <circle cx="11" cy="10" r="1.5" fill="currentColor"/>
+                            <circle cx="15" cy="14" r="1.5" fill="currentColor"/>
+                            <circle cx="20" cy="9" r="1.5" fill="currentColor"/>
+                        </svg>
+                        <span>Data Visualization</span>
+                    </div>
+                </div>
+            </div>
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <h4>Revenue Attribution</h4>
+                    <p>Track every touchpoint in the buyer journey and understand which channels and campaigns drive real revenue.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Dashboard Design</h4>
+                    <p>Build executive dashboards that tell the story of your business with clarity and actionable insights.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Data Hygiene</h4>
+                    <p>Clean, dedupe, and standardize your data to ensure accuracy across all systems and reports.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Forecasting Models</h4>
+                    <p>Develop predictive models that help you anticipate pipeline and revenue with confidence.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section class="service-section" id="tech-stack">
+        <div class="container">
+            <div class="service-header reverse">
+                <div class="service-content">
+                    <div class="service-label">Service 02</div>
+                    <div class="service-icon-large">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="6" height="6" rx="1"/>
+                            <rect x="14" y="4" width="6" height="6" rx="1"/>
+                            <rect x="4" y="14" width="6" height="6" rx="1"/>
+                            <rect x="14" y="14" width="6" height="6" rx="1"/>
+                        </svg>
+                    </div>
+                    <h2>Tech Stack</h2>
+                    <p>Make your tech work for you, not the other way around. We optimize HubSpot and your entire martech ecosystem to work together seamlessly.</p>
+                </div>
+                <div class="service-visual">
+                    <div class="visual-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                            <path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/>
+                        </svg>
+                        <span>Integration Architecture</span>
+                    </div>
+                </div>
+            </div>
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <h4>HubSpot Optimization</h4>
+                    <p>Maximize your HubSpot investment with portal audits, workflow optimization, and best-practice implementation.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Tool Selection</h4>
+                    <p>Navigate the martech landscape with expert guidance on which tools actually solve your problems.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Integration Design</h4>
+                    <p>Connect your tools so data flows seamlessly between systems without manual intervention.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Migration Support</h4>
+                    <p>Move to new platforms with confidence. We handle data migration, mapping, and validation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Automations Section -->
+    <section class="service-section" id="automations">
+        <div class="container">
+            <div class="service-header">
+                <div class="service-content">
+                    <div class="service-label">Service 03</div>
+                    <div class="service-icon-large">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                        </svg>
+                    </div>
+                    <h2>Automations</h2>
+                    <p>Eliminate manual work and build systems that run themselves. We design operational infrastructure that scales without adding headcount.</p>
+                </div>
+                <div class="service-visual">
+                    <div class="visual-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>
+                        </svg>
+                        <span>Workflow Automation</span>
+                    </div>
+                </div>
+            </div>
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <h4>Lead Routing</h4>
+                    <p>Route leads to the right rep instantly based on territory, segment, or custom logic.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Lifecycle Automation</h4>
+                    <p>Automate lead scoring, stage progression, and handoffs between marketing and sales.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Renewal Workflows</h4>
+                    <p>Never miss a renewal opportunity with automated triggers and task sequences.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Operational Playbooks</h4>
+                    <p>Document and automate your operational processes for consistency at scale.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Section -->
+    <section class="service-section" id="ai">
+        <div class="container">
+            <div class="service-header reverse">
+                <div class="service-content">
+                    <div class="service-label">Service 04</div>
+                    <div class="service-icon-large">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a4 4 0 0 1 4 4c0 1.1-.9 2-2 2h-4a2 2 0 0 1-2-2 4 4 0 0 1 4-4z"/>
+                            <path d="M12 8v14"/>
+                            <path d="M8 12h8"/>
+                            <path d="M9 16h6"/>
+                        </svg>
+                    </div>
+                    <h2>AI</h2>
+                    <p>Practical AI implementation—not hype. We deploy real solutions that multiply your team's capacity and uncover insights humans would miss.</p>
+                </div>
+                <div class="service-visual">
+                    <div class="visual-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M12 12v8"/>
+                            <path d="M8 16h8"/>
+                            <path d="M6 20h12"/>
+                        </svg>
+                        <span>AI Implementation</span>
+                    </div>
+                </div>
+            </div>
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <h4>Lead Scoring AI</h4>
+                    <p>Deploy machine learning models that predict which leads are most likely to convert.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Content Generation</h4>
+                    <p>Implement AI-assisted content creation for emails, sequences, and marketing materials.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Conversation Intelligence</h4>
+                    <p>Analyze sales calls and meetings to surface coaching insights and deal risks.</p>
+                </div>
+                <div class="capability-card">
+                    <h4>Predictive Analytics</h4>
+                    <p>Use AI to forecast churn, identify expansion opportunities, and optimize pricing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to <span class="highlight">transform</span> your RevOps?</h2>
+            <p>Let's have a conversation about where you are, where you want to be, and how we help you get there.</p>
+            <a href="contact.html" class="btn-glow">
+                Book Your Discovery Call
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <img src="assets/RevHub-icon.png" alt="RevHub Labs" class="logo-icon">
+                        <div class="logo-text">RevHub <span>Labs</span></div>
+                    </a>
+                    <p>Fractional RevOps excellence for mid-market B2B companies ready to scale.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#data">Data</a></li>
+                        <li><a href="#tech-stack">Tech Stack</a></li>
+                        <li><a href="#automations">Automations</a></li>
+                        <li><a href="#ai">AI</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Products</h4>
+                    <ul>
+                        <li><a href="revguide.html">RevGuide</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 RevHub Labs. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                    <a href="#">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

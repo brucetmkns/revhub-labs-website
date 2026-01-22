@@ -1,0 +1,18 @@
+# Excluded pages
+portal-analyzer.html
+blog.html
+blog-article.html
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs
+*.log
