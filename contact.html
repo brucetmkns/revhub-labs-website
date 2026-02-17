@@ -298,47 +298,30 @@
             font-size: 1rem;
         }
 
-        .calendar-placeholder {
-            background: var(--dark);
-            border: 1px dashed var(--dark-border);
-            border-radius: 12px;
-            padding: 4rem 2rem;
-            text-align: center;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .calendar-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--dark-elevated);
-            border: 1px solid var(--dark-border);
+        /* HubSpot Meetings Embed */
+        .meetings-iframe-container {
+            min-height: 680px;
             border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid var(--dark-border);
+            box-shadow:
+                0 4px 24px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(178, 239, 99, 0.06);
+            transition: box-shadow 0.3s ease;
         }
 
-        .calendar-icon svg {
-            color: var(--lime);
-            width: 36px;
-            height: 36px;
+        .meetings-iframe-container:hover {
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(178, 239, 99, 0.12);
         }
 
-        .calendar-placeholder h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .calendar-placeholder p {
-            color: var(--gray-400);
-            font-size: 0.95rem;
-            max-width: 280px;
+        .meetings-iframe-container iframe {
+            border-radius: 16px;
+            width: 100%;
+            min-height: 680px;
+            border: none;
         }
 
         .calendar-note {
@@ -948,6 +931,21 @@
                 padding: 8rem 0 3rem;
             }
 
+            .calendar-wrapper {
+                padding: 1.25rem;
+            }
+
+            .meetings-iframe-container {
+                min-height: 580px;
+                border-radius: 12px;
+                margin: 0 -0.25rem;
+            }
+
+            .meetings-iframe-container iframe {
+                min-height: 580px;
+                border-radius: 12px;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
@@ -1026,18 +1024,9 @@
                         <h2>Book a Discovery Call</h2>
                         <p>30 minutes to discuss your challenges and goals</p>
                     </div>
-                    <div class="calendar-placeholder">
-                        <div class="calendar-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="16" y1="2" x2="16" y2="6"/>
-                                <line x1="8" y1="2" x2="8" y2="6"/>
-                                <line x1="3" y1="10" x2="21" y2="10"/>
-                            </svg>
-                        </div>
-                        <h3>Calendar Integration</h3>
-                        <p>Calendly or HubSpot meetings embed will appear here</p>
-                    </div>
+                    <!-- HubSpot Meetings Embed -->
+                    <div class="meetings-iframe-container" data-src="https://meetings.hubspot.com/brucetmkns1?embed=true"></div>
+                    <script type="text/javascript" src="https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"></script>
                     <div class="calendar-note">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"/>
