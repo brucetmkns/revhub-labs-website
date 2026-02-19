@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/RevHub-icon.png">
+    <title>AI Readiness Assessment | RevHub Labs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --lime: #b2ef63;
+            --lime-glow: rgba(178, 239, 99, 0.4);
+            --lime-dark: #9ad94f;
+            --lime-muted: rgba(178, 239, 99, 0.12);
+            --lime-subtle: rgba(178, 239, 99, 0.06);
+            --black: #121212;
+            --dark: #181818;
+            --dark-elevated: #1E1E1E;
+            --dark-border: #2A2A2A;
+            --dark-border-hover: #3A3A3A;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-300: #BBBBBB;
+            --gray-400: #999999;
+            --gray-600: #7A7A7A;
+            --amber: #FFB547;
+            --amber-glow: rgba(255, 181, 71, 0.3);
+            --red: #FF6B6B;
+            --red-glow: rgba(255, 107, 107, 0.3);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ─── Assessment Shell ─── */
+        .assessment {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* ─── Ambient Background ─── */
+        .assessment-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .bg-gradient-1 {
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--lime-glow), transparent 70%);
+            top: -30%;
+            right: -20%;
+            opacity: 0.2;
+            animation: drift1 20s ease-in-out infinite;
+        }
+
+        .bg-gradient-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(178, 239, 99, 0.15), transparent 70%);
+            bottom: -20%;
+            left: -15%;
+            opacity: 0.15;
+            animation: drift2 25s ease-in-out infinite;
+        }
+
+        .bg-gradient-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(178, 239, 99, 0.1), transparent 70%);
+            top: 40%;
+            left: 50%;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+
+        @keyframes drift1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-40px, 30px) scale(1.05); }
+            66% { transform: translate(20px, -20px) scale(0.95); }
+        }
+
+        @keyframes drift2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -40px) scale(1.08); }
+        }
+
+        /* Grid texture overlay */
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(178, 239, 99, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(178, 239, 99, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.5;
+        }
+
+        /* ─── Progress Bar ─── */
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--dark-border);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .progress-bar.visible {
+            opacity: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--lime);
+            box-shadow: 0 0 12px var(--lime-glow);
+            width: 0%;
+            transition: width 0.6s var(--ease-out-expo);
+        }
+
+        /* ─── Progress Counter ─── */
+        .progress-counter {
+            position: absolute;
+            top: 20px;
+            right: 28px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            letter-spacing: 0.05em;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .progress-counter.visible {
+            opacity: 1;
+        }
+
+        .progress-counter .current {
+            color: var(--white);
+        }
+
+        /* ─── Navigation Arrows ─── */
+        .nav-arrows {
+            position: absolute;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            gap: 6px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .nav-arrows.visible {
+            opacity: 1;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray-400);
+            transition: all 0.25s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--dark-border);
+            color: var(--white);
+            border-color: var(--dark-border-hover);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ─── Slide Container ─── */
+        .slides {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(60px);
+            transition: all 0.65s var(--ease-out-expo);
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .slide.exit-up {
+            opacity: 0;
+            transform: translateY(-60px);
+        }
+
+        .slide.exit-down {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        .slide-inner {
+            width: 100%;
+            max-width: 680px;
+        }
+
+        /* ─── Welcome Screen ─── */
+        .welcome-content {
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--lime-muted);
+            border: 1px solid rgba(178, 239, 99, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2.5rem;
+            animation: welcomePulse 3s ease-in-out infinite;
+        }
+
+        .welcome-icon svg {
+            width: 28px;
+            height: 28px;
+            color: var(--lime);
+        }
+
+        @keyframes welcomePulse {
+            0%, 100% { box-shadow: 0 0 0 0 var(--lime-muted); }
+            50% { box-shadow: 0 0 0 16px rgba(178, 239, 99, 0); }
+        }
+
+        .welcome-content h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            margin-bottom: 1.25rem;
+        }
+
+        .welcome-content h1 .highlight {
+            color: var(--lime);
+            text-shadow: 0 0 60px var(--lime-glow);
+        }
+
+        .welcome-content .subtitle {
+            font-size: 1.1rem;
+            color: var(--gray-400);
+            max-width: 480px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .start-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--lime);
+            color: var(--black);
+            padding: 1rem 2.25rem;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.35s var(--ease-out-expo);
+            box-shadow: 0 0 30px var(--lime-glow), 0 4px 20px rgba(0,0,0,0.3);
+            letter-spacing: -0.01em;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px var(--lime-glow), 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .start-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .start-btn:hover svg {
+            transform: translateX(3px);
+        }
+
+        .welcome-meta {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .welcome-meta .dot {
+            width: 3px;
+            height: 3px;
+            background: var(--gray-400);
+            border-radius: 50%;
+        }
+
+        /* ─── Question Slides ─── */
+        .question-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--lime-subtle);
+            border: 1px solid rgba(178, 239, 99, 0.1);
+            padding: 0.35rem 0.85rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--lime);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--lime);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .question-number .arrow {
+            color: var(--lime);
+            opacity: 0.6;
+        }
+
+        .question-text {
+            font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+            font-weight: 600;
+            line-height: 1.5;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            margin-bottom: 2.5rem;
+        }
+
+        /* ─── Scale Selector ─── */
+        .scale-container {
+            margin-bottom: 1rem;
+        }
+
+        .scale-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .scale-btn {
+            flex: 1;
+            height: 56px;
+            background: var(--dark-elevated);
+            border: 1.5px solid var(--dark-border);
+            border-radius: 12px;
+            color: var(--gray-400);
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scale-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--lime);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 11px;
+        }
+
+        .scale-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .scale-btn:hover {
+            border-color: var(--dark-border-hover);
+            background: rgba(42, 42, 42, 0.8);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .scale-btn.selected {
+            border-color: var(--lime);
+            color: var(--black);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--lime-glow), 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .scale-btn.selected::before {
+            opacity: 1;
+        }
+
+        /* Selection ripple */
+        .scale-btn.ripple::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border: 2px solid var(--lime);
+            border-radius: 14px;
+            opacity: 0;
+            animation: selectionRipple 0.6s var(--ease-out-expo);
+        }
+
+        @keyframes selectionRipple {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.15); opacity: 0; }
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .key-hint {
+            margin-top: 2rem;
+            font-size: 0.78rem;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .key-hint kbd {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 5px;
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--gray-400);
+        }
+
+        /* ─── Results Screen ─── */
+        .results-content {
+            text-align: center;
+        }
+
+        /* ─── Results: Two-column hero layout ─── */
+        .results-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+            margin-bottom: 2rem;
+        }
+
+        .results-score-section {
+            text-align: center;
+        }
+
+        .score-ring-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.25rem;
+        }
+
+        .score-ring {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .score-ring-bg {
+            fill: none;
+            stroke: var(--dark-border);
+            stroke-width: 6;
+        }
+
+        .score-ring-fill {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 452;
+            stroke-dashoffset: 452;
+            transition: stroke-dashoffset 1.5s var(--ease-out-expo), stroke 0.5s ease;
+        }
+
+        .score-ring-glow {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 452;
+            stroke-dashoffset: 452;
+            opacity: 0.3;
+            filter: blur(4px);
+            transition: stroke-dashoffset 1.5s var(--ease-out-expo), stroke 0.5s ease;
+        }
+
+        .score-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-number .value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        .score-number .total {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .tier-badge.tier-low {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            color: var(--red);
+        }
+
+        .tier-badge.tier-mid {
+            background: rgba(255, 181, 71, 0.1);
+            border: 1px solid rgba(255, 181, 71, 0.2);
+            color: var(--amber);
+        }
+
+        .tier-badge.tier-high {
+            background: var(--lime-subtle);
+            border: 1px solid rgba(178, 239, 99, 0.2);
+            color: var(--lime);
+        }
+
+        .tier-description {
+            font-size: 0.95rem;
+            color: var(--gray-300);
+            line-height: 1.6;
+            max-width: 520px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* ─── CTA Card (above the fold) ─── */
+        .cta-card {
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            text-align: left;
+        }
+
+        .cta-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.02em;
+        }
+
+        .cta-card .cta-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .cta-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+
+        .cta-form .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-field input {
+            width: 100%;
+            background: var(--dark);
+            border: 1.5px solid var(--dark-border);
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            color: var(--white);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .form-field input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .form-field input:focus {
+            border-color: var(--lime);
+            box-shadow: 0 0 0 3px rgba(178, 239, 99, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--lime);
+            color: var(--black);
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            box-shadow: 0 0 20px var(--lime-glow);
+            margin-top: 0.15rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px var(--lime-glow);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ─── Form ↔ Thank-you crossfade ─── */
+        .cta-form-wrapper {
+            position: relative;
+        }
+
+        .cta-form {
+            transition: opacity 0.45s var(--ease-out-expo), transform 0.45s var(--ease-out-expo);
+        }
+
+        .cta-form.exit {
+            opacity: 0;
+            transform: translateY(8px) scale(0.97);
+            pointer-events: none;
+        }
+
+        .cta-form.hidden {
+            display: none;
+        }
+
+        .cta-subtitle {
+            transition: opacity 0.35s ease;
+        }
+
+        .cta-subtitle.hidden {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* Thank you state */
+        .cta-thank-you {
+            text-align: center;
+            padding: 1.5rem 0;
+            opacity: 0;
+            transform: translateY(16px) scale(0.95);
+            display: none;
+            transition: opacity 0.55s var(--ease-out-expo),
+                        transform 0.55s var(--ease-out-expo);
+        }
+
+        .cta-thank-you.enter {
+            display: block;
+        }
+
+        .cta-thank-you.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .thank-you-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--lime-muted);
+            border: 1px solid rgba(178, 239, 99, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--lime);
+            transform: scale(0);
+            transition: transform 0.5s var(--ease-out-expo);
+            transition-delay: 0.15s;
+        }
+
+        .cta-thank-you.show .thank-you-icon {
+            transform: scale(1);
+        }
+
+        /* Checkmark draw animation */
+        .thank-you-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .thank-you-icon .check-path {
+            stroke-dasharray: 28;
+            stroke-dashoffset: 28;
+            transition: stroke-dashoffset 0.45s var(--ease-out-expo);
+            transition-delay: 0.4s;
+        }
+
+        .cta-thank-you.show .check-path {
+            stroke-dashoffset: 0;
+        }
+
+        /* Success shimmer ring */
+        @keyframes successPulse {
+            0% { box-shadow: 0 0 0 0 rgba(178, 239, 99, 0.4); }
+            70% { box-shadow: 0 0 0 18px rgba(178, 239, 99, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(178, 239, 99, 0); }
+        }
+
+        .cta-thank-you.show .thank-you-icon {
+            animation: successPulse 1.2s ease-out 0.3s;
+        }
+
+        .cta-thank-you h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.45s var(--ease-out-expo);
+            transition-delay: 0.25s;
+        }
+
+        .cta-thank-you.show h4 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-thank-you p {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.45s var(--ease-out-expo);
+            transition-delay: 0.35s;
+        }
+
+        .cta-thank-you.show p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ─── Retake Button ─── */
+        .retake-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 1rem;
+            padding: 0.5rem 1.1rem;
+            background: transparent;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            color: var(--gray-400);
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: all 0.4s var(--ease-out-expo);
+            transition-delay: 0.5s;
+        }
+
+        .cta-thank-you.show .retake-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .retake-btn:hover {
+            border-color: var(--lime);
+            color: var(--lime);
+            background: var(--lime-subtle);
+        }
+
+        .retake-btn svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        /* ─── Focus Areas ─── */
+        .focus-areas {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .focus-areas-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .focus-areas-title svg {
+            width: 14px;
+            height: 14px;
+            color: var(--amber);
+        }
+
+        .focus-area-card {
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 1.15rem 1.25rem;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: border-color 0.25s ease;
+        }
+
+        .focus-area-card:hover {
+            border-color: var(--dark-border-hover);
+        }
+
+        .focus-area-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .focus-area-icon.status-red {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            color: var(--red);
+        }
+
+        .focus-area-icon.status-amber {
+            background: rgba(255, 181, 71, 0.1);
+            border: 1px solid rgba(255, 181, 71, 0.15);
+            color: var(--amber);
+        }
+
+        .focus-area-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .focus-area-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .focus-area-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 0.15rem;
+        }
+
+        .focus-area-desc {
+            font-size: 0.78rem;
+            color: var(--gray-400);
+            line-height: 1.4;
+        }
+
+        .focus-area-score {
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .focus-area-score .score-val {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .focus-area-score .score-max {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .focus-area-score .score-val.text-red { color: var(--red); }
+        .focus-area-score .score-val.text-amber { color: var(--amber); }
+
+        /* All clear state */
+        .all-clear {
+            background: var(--dark-elevated);
+            border: 1px solid rgba(178, 239, 99, 0.15);
+            border-radius: 14px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .all-clear-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--lime-muted);
+            border: 1px solid rgba(178, 239, 99, 0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--lime);
+        }
+
+        .all-clear-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .all-clear h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--lime);
+            margin-bottom: 0.1rem;
+        }
+
+        .all-clear p {
+            font-size: 0.78rem;
+            color: var(--gray-400);
+            line-height: 1.4;
+        }
+
+        /* ─── Area Breakdown (grouped) ─── */
+        .area-breakdown {
+            text-align: left;
+            background: var(--dark-elevated);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+
+        .area-breakdown-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+
+        .area-group {
+            margin-bottom: 1rem;
+        }
+
+        .area-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .area-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .area-group-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .area-group-score {
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .area-group-bar-track {
+            height: 8px;
+            background: var(--dark-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.35rem;
+        }
+
+        .area-group-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s var(--ease-out-expo);
+        }
+
+        .area-group-questions {
+            font-size: 0.72rem;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .area-group + .area-group {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(42, 42, 42, 0.6);
+        }
+
+        /* ─── Branding Footer ─── */
+        .assessment-brand {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 50;
+        }
+
+        .assessment-brand a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.72rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.25s ease;
+        }
+
+        .assessment-brand a:hover {
+            color: var(--gray-400);
+        }
+
+        .assessment-brand img {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 640px) {
+            .slide {
+                padding: 1.25rem;
+                padding-top: 3rem;
+                align-items: flex-start;
+                padding-top: 15vh;
+            }
+
+            .welcome-content h1 {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.15rem;
+            }
+
+            .scale-buttons {
+                gap: 5px;
+            }
+
+            .scale-btn {
+                height: 48px;
+                font-size: 1rem;
+                border-radius: 10px;
+            }
+
+            .progress-counter {
+                right: 16px;
+                top: 14px;
+            }
+
+            .nav-arrows {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            .assessment-brand {
+                bottom: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .results-hero {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .score-ring-container {
+                width: 120px;
+                height: 120px;
+            }
+
+            .score-number .value {
+                font-size: 2.2rem;
+            }
+
+            .cta-form {
+                grid-template-columns: 1fr;
+            }
+
+            .results-slide .slide-inner {
+                max-width: 100%;
+            }
+        }
+
+        /* ─── Results slide scrollable ─── */
+        .results-slide {
+            align-items: flex-start !important;
+            padding-top: 2rem !important;
+            padding-bottom: 3rem !important;
+        }
+
+        .results-slide .slide-inner {
+            max-width: 720px;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            padding-right: 8px;
+            padding-bottom: 2rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--dark-border) transparent;
+        }
+
+        .results-slide .slide-inner::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .results-slide .slide-inner::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .results-slide .slide-inner::-webkit-scrollbar-thumb {
+            background: var(--dark-border);
+            border-radius: 2px;
+        }
+
+        /* ─── Animations for results ─── */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .animate-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s var(--ease-out-expo);
+        }
+
+        /* ─── Score counting ─── */
+        @keyframes scoreReveal {
+            from { opacity: 0; transform: scale(0.5); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        .score-revealed {
+            animation: scoreReveal 0.8s var(--ease-out-expo) forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="assessment" id="assessment">
+        <!-- Background -->
+        <div class="assessment-bg">
+            <div class="bg-gradient bg-gradient-1"></div>
+            <div class="bg-gradient bg-gradient-2"></div>
+            <div class="bg-gradient bg-gradient-3" id="bgOrb3"></div>
+            <div class="bg-grid"></div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Progress Counter -->
+        <div class="progress-counter" id="progressCounter">
+            <span class="current" id="currentQ">1</span> of 10
+        </div>
+
+        <!-- Navigation Arrows -->
+        <div class="nav-arrows" id="navArrows">
+            <button class="nav-btn" id="prevBtn" disabled aria-label="Previous question">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"/>
+                </svg>
+            </button>
+            <button class="nav-btn" id="nextBtn" aria-label="Next question">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Slides -->
+        <div class="slides" id="slides">
+
+            <!-- Welcome Slide -->
+            <div class="slide active" data-slide="welcome">
+                <div class="slide-inner">
+                    <div class="welcome-content">
+                        <div class="welcome-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                        <h1>AI Readiness<br><span class="highlight">Reality Check</span></h1>
+                        <p class="subtitle">Score your GTM foundation across 10 dimensions. Find out if you're ready for AI, or if there's groundwork to lay first.</p>
+                        <button class="start-btn" id="startBtn">
+                            Start Assessment
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <div class="welcome-meta">
+                            <span>Takes ~3 minutes</span>
+                            <span class="dot"></span>
+                            <span>10 questions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question slides injected by JS -->
+
+            <!-- Results Slide -->
+            <div class="slide results-slide" data-slide="results">
+                <div class="slide-inner">
+                    <div class="results-content">
+
+                        <!-- Hero: Score + CTA side by side -->
+                        <div class="results-hero animate-in" id="resultsHero">
+                            <!-- Left: Score -->
+                            <div class="results-score-section">
+                                <div class="score-ring-container">
+                                    <svg class="score-ring" viewBox="0 0 160 160">
+                                        <circle class="score-ring-bg" cx="80" cy="80" r="72"/>
+                                        <circle class="score-ring-glow" id="ringGlow" cx="80" cy="80" r="72"/>
+                                        <circle class="score-ring-fill" id="ringFill" cx="80" cy="80" r="72"/>
+                                    </svg>
+                                    <div class="score-number">
+                                        <div class="value" id="scoreValue">0</div>
+                                        <div class="total">out of 50</div>
+                                    </div>
+                                </div>
+                                <div class="tier-badge" id="tierBadge"></div>
+                                <p class="tier-description" id="tierDescription"></p>
+                            </div>
+
+                            <!-- Right: CTA Form -->
+                            <div class="cta-card">
+                                <h3>Get your personalized action plan</h3>
+                                <p class="cta-subtitle" id="ctaSubtitle">We'll review your scores and send tailored next steps for your team.</p>
+                                <div class="cta-form-wrapper">
+                                <form class="cta-form" id="leadForm">
+                                    <input type="hidden" id="hiddenScore" name="ai_readiness_score" value="">
+                                    <input type="hidden" id="hiddenTier" name="ai_readiness_tier" value="">
+                                    <div class="form-field">
+                                        <input type="text" name="firstName" placeholder="First name" required>
+                                    </div>
+                                    <div class="form-field">
+                                        <input type="text" name="lastName" placeholder="Last name" required>
+                                    </div>
+                                    <div class="form-field full-width">
+                                        <input type="email" name="email" placeholder="Work email" required>
+                                    </div>
+                                    <div class="form-field full-width">
+                                        <input type="text" name="company" placeholder="Company">
+                                    </div>
+                                    <div class="form-field full-width">
+                                        <button type="submit" class="submit-btn" id="submitBtn">
+                                            Get Your Action Plan
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </form>
+                                <div class="cta-thank-you" id="leadThankYou">
+                                    <div class="thank-you-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline class="check-path" points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <h4>We'll be in touch</h4>
+                                    <p>Expect a personalized action plan in your inbox soon.</p>
+                                    <button type="button" class="retake-btn" id="retakeBtn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="1 4 1 10 7 10"/>
+                                            <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+                                        </svg>
+                                        Retake Assessment
+                                    </button>
+                                </div>
+                                </div><!-- /cta-form-wrapper -->
+                            </div>
+                        </div>
+
+                        <!-- Focus Areas (only at-risk) -->
+                        <div class="focus-areas animate-in" id="focusAreas" style="transition-delay: 0.2s">
+                            <div class="focus-areas-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"/>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                </svg>
+                                Areas to Focus On
+                            </div>
+                            <div id="focusAreasContent"></div>
+                        </div>
+
+                        <!-- Grouped Breakdown -->
+                        <div class="area-breakdown animate-in" id="areaBreakdown" style="transition-delay: 0.35s">
+                            <div class="area-breakdown-title">Breakdown by Area</div>
+                            <div id="areaBreakdownRows"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branding -->
+        <div class="assessment-brand">
+            <a href="index.html">
+                <img src="assets/RevHub-icon.png" alt="" onerror="this.style.display='none'">
+                Powered by RevHub Labs
+            </a>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // ─── Data ───
+        const questions = [
+            { category: 'Data Foundation', text: 'We have a reliable, primary source of truth for GTM data (accounts, contacts, opps, activities) with basic hygiene and ownership.' },
+            { category: 'Content Library', text: 'Our core messaging, offers, decks, FAQs, case studies, and playbooks live in a structured, findable library that AI could safely draw from.' },
+            { category: 'Lead Routing', text: 'Lead/account enrichment and routing rules function well enough that \u201cwho owns what\u201d and \u201cwho we should care about\u201d are clear.' },
+            { category: 'AI Use Cases', text: 'We\u2019ve identified a short list of AI use cases tied to real metrics (e.g., faster follow-up, better personalization, more meetings, stronger content).' },
+            { category: 'ICP & Personas', text: 'We have defined ICPs, personas, and key verticals with clear problems, language, and value props that AI could be instructed to follow.' },
+            { category: 'Workflows', text: 'We already have repeatable workflows where AI can plug in (e.g., meeting notes \u2192 CRM, follow-up templates, SEO briefs, snippets from webinars).' },
+            { category: 'Brand Voice', text: 'We have defined brand voice, tone rules, and basic QA expectations for outbound and content (human or AI).' },
+            { category: 'Data Governance', text: 'We know which tools are approved, how customer data can/can\u2019t be used, and have basic safeguards to avoid dumping sensitive data into random AI tools.' },
+            { category: 'Team Readiness', text: 'Key GTM teams (Sales, SDRs, CS, Marketing, RevOps) are open to AI, and we have at least a couple of internal champions to lead adoption.' },
+            { category: 'Measurement', text: 'We can track the impact of AI experiments (e.g., reply rates, time saved, cycle time, pipeline, content throughput).' }
+        ];
+
+        // Group questions into 3 key areas
+        const areas = [
+            {
+                name: 'Data & Infrastructure',
+                questionIndices: [0, 2, 7], // Data Foundation, Lead Routing, Data Governance
+                maxScore: 15,
+                description: 'CRM hygiene, routing, and governance',
+                focusAdvice: 'Clean up your data foundation before layering AI on top. Focus on CRM hygiene, routing rules, and data governance policies.'
+            },
+            {
+                name: 'Strategy & Content',
+                questionIndices: [1, 3, 4, 6], // Content Library, AI Use Cases, ICP & Personas, Brand Voice
+                maxScore: 20,
+                description: 'Content, ICPs, use cases, and brand voice',
+                focusAdvice: 'Define your ICP, build a structured content library, and document brand voice guidelines AI can follow.'
+            },
+            {
+                name: 'Execution & Adoption',
+                questionIndices: [5, 8, 9], // Workflows, Team Readiness, Measurement
+                maxScore: 15,
+                description: 'Workflows, team buy-in, and measurement',
+                focusAdvice: 'Build repeatable workflows AI can plug into, get champions on board, and set up measurement to track impact.'
+            }
+        ];
+
+        const tiers = [
+            { min: 0,  max: 29, label: 'Not Ready',     class: 'tier-low',  color: 'var(--red)',   glowColor: 'var(--red-glow)',   description: 'AI will amplify your chaos. Fix data, content library, routing, and guardrails first.' },
+            { min: 30, max: 39, label: 'Getting There',  class: 'tier-mid',  color: 'var(--amber)', glowColor: 'var(--amber-glow)', description: 'You can start layering AI in narrow lanes while tightening a few weak spots.' },
+            { min: 40, max: 50, label: 'Ready',          class: 'tier-high', color: 'var(--lime)',  glowColor: 'var(--lime-glow)',  description: 'You\u2019re structurally ready. Time to embed AI directly into workflows.' }
+        ];
+
+        // ─── State ───
+        let currentSlide = 0; // 0 = welcome, 1-10 = questions, 11 = results
+        let answers = new Array(10).fill(null);
+        let transitioning = false;
+
+        // ─── DOM ───
+        const slidesContainer = document.getElementById('slides');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const progressCounter = document.getElementById('progressCounter');
+        const currentQEl = document.getElementById('currentQ');
+        const navArrows = document.getElementById('navArrows');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const startBtn = document.getElementById('startBtn');
+
+        // ─── Build Question Slides ───
+        const resultsSlide = slidesContainer.querySelector('[data-slide="results"]');
+
+        questions.forEach((q, i) => {
+            const slide = document.createElement('div');
+            slide.className = 'slide';
+            slide.dataset.slide = 'q' + i;
+            slide.innerHTML = `
+                <div class="slide-inner">
+                    <div class="question-category">${q.category}</div>
+                    <div class="question-number">${i + 1} <span class="arrow">\u2192</span></div>
+                    <div class="question-text">${q.text}</div>
+                    <div class="scale-container">
+                        <div class="scale-buttons">
+                            ${[0,1,2,3,4,5].map(v => `<button type="button" class="scale-btn" data-q="${i}" data-val="${v}"><span>${v}</span></button>`).join('')}
+                        </div>
+                        <div class="scale-labels">
+                            <span>Strongly disagree</span>
+                            <span>Strongly agree</span>
+                        </div>
+                    </div>
+                    <div class="key-hint">
+                        Press <kbd>0</kbd>-<kbd>5</kbd> or click &nbsp;\u00b7&nbsp; <kbd>\u2191</kbd><kbd>\u2193</kbd> to navigate
+                    </div>
+                </div>
+            `;
+            slidesContainer.insertBefore(slide, resultsSlide);
+        });
+
+        const allSlides = slidesContainer.querySelectorAll('.slide');
+
+        // ─── Slide Navigation ───
+        function goToSlide(index, direction) {
+            if (transitioning || index < 0 || index >= allSlides.length) return;
+            if (index === currentSlide) return;
+
+            transitioning = true;
+            const dir = direction || (index > currentSlide ? 'up' : 'down');
+
+            const current = allSlides[currentSlide];
+            const next = allSlides[index];
+
+            // Exit current
+            current.classList.remove('active');
+            current.classList.add(dir === 'up' ? 'exit-up' : 'exit-down');
+
+            // Prepare next
+            next.classList.remove('exit-up', 'exit-down');
+            next.style.transform = dir === 'up' ? 'translateY(60px)' : 'translateY(-60px)';
+            next.style.opacity = '0';
+
+            // Force reflow
+            void next.offsetHeight;
+
+            next.style.transform = '';
+            next.style.opacity = '';
+            next.classList.add('active');
+
+            currentSlide = index;
+            updateUI();
+
+            // Restore previous answer selection
+            if (index >= 1 && index <= 10) {
+                const qi = index - 1;
+                if (answers[qi] !== null) {
+                    const btns = next.querySelectorAll('.scale-btn');
+                    btns.forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) === answers[qi]));
+                }
+            }
+
+            // Animate results
+            if (next.dataset.slide === 'results') {
+                showResults();
+            }
+
+            setTimeout(() => {
+                current.classList.remove('exit-up', 'exit-down');
+                transitioning = false;
+            }, 650);
+        }
+
+        function updateUI() {
+            const isQuestion = currentSlide >= 1 && currentSlide <= 10;
+            const isResults = currentSlide === 11;
+
+            // Progress
+            progressBar.classList.toggle('visible', isQuestion);
+            progressCounter.classList.toggle('visible', isQuestion);
+            navArrows.classList.toggle('visible', isQuestion);
+
+            if (isQuestion) {
+                const qi = currentSlide - 1;
+                const answered = answers.filter(a => a !== null).length;
+                progressFill.style.width = (answered / 10 * 100) + '%';
+                currentQEl.textContent = qi + 1;
+                prevBtn.disabled = currentSlide <= 1;
+
+                // Only allow next if this question is answered
+                nextBtn.disabled = answers[qi] === null;
+            }
+
+            if (isResults) {
+                progressBar.classList.remove('visible');
+                progressCounter.classList.remove('visible');
+                navArrows.classList.remove('visible');
+            }
+        }
+
+        // ─── Scale Button Clicks ───
+        slidesContainer.addEventListener('click', function(e) {
+            const btn = e.target.closest('.scale-btn');
+            if (!btn) return;
+
+            const qi = parseInt(btn.dataset.q);
+            const val = parseInt(btn.dataset.val);
+
+            answers[qi] = val;
+
+            // Update selection UI
+            const slide = allSlides[qi + 1];
+            slide.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected', 'ripple'));
+            btn.classList.add('selected', 'ripple');
+
+            // Update progress
+            updateUI();
+
+            // Auto-advance after delay
+            setTimeout(() => {
+                if (qi < 9) {
+                    goToSlide(currentSlide + 1, 'up');
+                } else {
+                    // Last question — go to results
+                    goToSlide(11, 'up');
+                }
+            }, 600);
+        });
+
+        // ─── Start Button ───
+        startBtn.addEventListener('click', () => goToSlide(1, 'up'));
+
+        // ─── Nav Buttons ───
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 1) goToSlide(currentSlide - 1, 'down');
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide >= 1 && currentSlide <= 10) {
+                const qi = currentSlide - 1;
+                if (answers[qi] !== null) {
+                    if (currentSlide < 10) {
+                        goToSlide(currentSlide + 1, 'up');
+                    } else {
+                        goToSlide(11, 'up');
+                    }
+                }
+            }
+        });
+
+        // ─── Keyboard ───
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT') return; // Don't capture when in form fields
+
+            // Welcome: Enter to start
+            if (currentSlide === 0 && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                goToSlide(1, 'up');
+                return;
+            }
+
+            // Questions
+            if (currentSlide >= 1 && currentSlide <= 10) {
+                const qi = currentSlide - 1;
+
+                // Number keys 0-5
+                if (e.key >= '0' && e.key <= '5') {
+                    e.preventDefault();
+                    const val = parseInt(e.key);
+                    answers[qi] = val;
+                    const slide = allSlides[qi + 1];
+                    slide.querySelectorAll('.scale-btn').forEach(b => {
+                        b.classList.remove('selected', 'ripple');
+                        if (parseInt(b.dataset.val) === val) {
+                            b.classList.add('selected', 'ripple');
+                        }
+                    });
+                    updateUI();
+                    setTimeout(() => {
+                        if (qi < 9) {
+                            goToSlide(currentSlide + 1, 'up');
+                        } else {
+                            goToSlide(11, 'up');
+                        }
+                    }, 600);
+                    return;
+                }
+
+                // Arrow keys
+                if (e.key === 'ArrowUp' && currentSlide > 1) {
+                    e.preventDefault();
+                    goToSlide(currentSlide - 1, 'down');
+                    return;
+                }
+                if (e.key === 'ArrowDown' || e.key === 'Enter') {
+                    e.preventDefault();
+                    if (answers[qi] !== null) {
+                        if (currentSlide < 10) {
+                            goToSlide(currentSlide + 1, 'up');
+                        } else {
+                            goToSlide(11, 'up');
+                        }
+                    }
+                    return;
+                }
+            }
+        });
+
+        // ─── Results ───
+        function showResults() {
+            const totalScore = answers.reduce((s, v) => s + (v || 0), 0);
+            const tier = tiers.find(t => totalScore >= t.min && totalScore <= t.max) || tiers[0];
+
+            // Hidden fields
+            document.getElementById('hiddenScore').value = totalScore;
+            document.getElementById('hiddenTier').value = tier.label;
+
+            // Score ring
+            const circumference = 2 * Math.PI * 72; // ~452
+            const offset = circumference - (totalScore / 50) * circumference;
+            const ringFill = document.getElementById('ringFill');
+            const ringGlow = document.getElementById('ringGlow');
+
+            ringFill.style.stroke = tier.color;
+            ringGlow.style.stroke = tier.color;
+
+            // Animate ring after a beat
+            setTimeout(() => {
+                ringFill.style.strokeDashoffset = offset;
+                ringGlow.style.strokeDashoffset = offset;
+            }, 300);
+
+            // Animate score number
+            const scoreValueEl = document.getElementById('scoreValue');
+            scoreValueEl.style.color = tier.color;
+            animateValue(scoreValueEl, 0, totalScore, 1200);
+
+            // Tier badge
+            const tierBadge = document.getElementById('tierBadge');
+            tierBadge.className = 'tier-badge ' + tier.class;
+            tierBadge.innerHTML = `<span>${tier.label}</span>`;
+
+            // Description
+            document.getElementById('tierDescription').textContent = tier.description;
+
+            // Background orb color shift
+            const bgOrb = document.getElementById('bgOrb3');
+            bgOrb.style.opacity = '0.25';
+            bgOrb.style.background = `radial-gradient(circle, ${tier.glowColor}, transparent 70%)`;
+
+            // ─── Focus Areas (only at-risk) ───
+            const focusContent = document.getElementById('focusAreasContent');
+            const focusSection = document.getElementById('focusAreas');
+            focusContent.innerHTML = '';
+
+            // Calculate area scores
+            const areaScores = areas.map(area => {
+                const score = area.questionIndices.reduce((s, qi) => s + (answers[qi] || 0), 0);
+                const pct = score / area.maxScore;
+                return { ...area, score, pct };
+            });
+
+            // Filter to at-risk areas (below 60% of max)
+            const atRisk = areaScores.filter(a => a.pct < 0.6);
+
+            if (atRisk.length > 0) {
+                atRisk.forEach(area => {
+                    const isRed = area.pct < 0.35;
+                    const statusClass = isRed ? 'status-red' : 'status-amber';
+                    const textClass = isRed ? 'text-red' : 'text-amber';
+                    const iconSvg = isRed
+                        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+                        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+
+                    const card = document.createElement('div');
+                    card.className = 'focus-area-card';
+                    card.innerHTML = `
+                        <div class="focus-area-icon ${statusClass}">${iconSvg}</div>
+                        <div class="focus-area-details">
+                            <div class="focus-area-name">${area.name}</div>
+                            <div class="focus-area-desc">${area.focusAdvice}</div>
+                        </div>
+                        <div class="focus-area-score">
+                            <div class="score-val ${textClass}">${area.score}</div>
+                            <div class="score-max">/ ${area.maxScore}</div>
+                        </div>
+                    `;
+                    focusContent.appendChild(card);
+                });
+                focusSection.style.display = '';
+            } else {
+                // All areas are strong
+                focusContent.innerHTML = `
+                    <div class="all-clear">
+                        <div class="all-clear-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>No critical gaps</h4>
+                            <p>All three areas are in good shape. You're ready to go deeper with AI across your GTM motion.</p>
+                        </div>
+                    </div>
+                `;
+                focusSection.style.display = '';
+            }
+
+            // ─── Grouped Area Breakdown ───
+            const breakdownRows = document.getElementById('areaBreakdownRows');
+            breakdownRows.innerHTML = '';
+
+            areaScores.forEach((area, i) => {
+                const pct = (area.score / area.maxScore) * 100;
+                let barColor = 'var(--lime)';
+                let scoreColor = 'var(--lime)';
+                if (area.pct < 0.35) { barColor = 'var(--red)'; scoreColor = 'var(--red)'; }
+                else if (area.pct < 0.6) { barColor = 'var(--amber)'; scoreColor = 'var(--amber)'; }
+
+                const questionNames = area.questionIndices.map(qi => questions[qi].category).join(' \u00b7 ');
+
+                const group = document.createElement('div');
+                group.className = 'area-group';
+                group.innerHTML = `
+                    <div class="area-group-header">
+                        <div class="area-group-name">${area.name}</div>
+                        <div class="area-group-score" style="color: ${scoreColor}">${area.score} / ${area.maxScore}</div>
+                    </div>
+                    <div class="area-group-bar-track">
+                        <div class="area-group-bar-fill" style="background: ${barColor}"></div>
+                    </div>
+                    <div class="area-group-questions">${questionNames}</div>
+                `;
+                breakdownRows.appendChild(group);
+
+                // Animate bars staggered
+                setTimeout(() => {
+                    group.querySelector('.area-group-bar-fill').style.width = pct + '%';
+                }, 600 + i * 150);
+            });
+
+            // Animate sections in
+            setTimeout(() => {
+                document.querySelectorAll('.animate-in').forEach(el => el.classList.add('visible'));
+            }, 100);
+        }
+
+        function animateValue(el, start, end, duration) {
+            const range = end - start;
+            const startTime = performance.now();
+
+            function update(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease out quart
+                const eased = 1 - Math.pow(1 - progress, 4);
+                el.textContent = Math.round(start + range * eased);
+                if (progress < 1) requestAnimationFrame(update);
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // ─── Lead Form ───
+        const leadForm = document.getElementById('leadForm');
+        const leadThankYou = document.getElementById('leadThankYou');
+        const ctaSubtitle = document.getElementById('ctaSubtitle');
+
+        leadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Sending\u2026';
+
+            const formData = new FormData(leadForm);
+
+            // Build area + individual score summaries for HubSpot context
+            const areaScoreSummary = areas.map(area => {
+                const score = area.questionIndices.reduce((s, qi) => s + (answers[qi] || 0), 0);
+                return `${area.name}: ${score}/${area.maxScore}`;
+            }).join('; ');
+
+            const individualScoreSummary = questions.map((q, i) => {
+                return `${q.category}: ${answers[i] !== null ? answers[i] : '-'}/5`;
+            }).join('; ');
+
+            // ─── HubSpot Forms v3 Submit API ───
+            const HS_PORTAL_ID = '51078521';
+            const HS_FORM_ID  = '20eb80fe-7d76-470b-bd03-ff147b5f0905';
+
+            const payload = {
+                fields: [
+                    { objectTypeId: '0-1', name: 'firstname', value: formData.get('firstName') || '' },
+                    { objectTypeId: '0-1', name: 'lastname',  value: formData.get('lastName') || '' },
+                    { objectTypeId: '0-1', name: 'email',     value: formData.get('email') || '' },
+                    { objectTypeId: '0-1', name: 'company',   value: formData.get('company') || '' }
+                ],
+                context: {
+                    pageUri: window.location.href,
+                    pageName: document.title,
+                    hutk: (document.cookie.match(/(?:^|;\s*)hubspotutk=([^;]*)/) || [])[1] || undefined
+                },
+                legalConsentOptions: {
+                    consent: {
+                        consentToProcess: true,
+                        text: 'I agree to receive communications from RevHub Labs.'
+                    }
+                }
+            };
+
+            // Append score data — uses SUBMISSIONID context so it always goes through,
+            // even if custom properties don't exist yet on the HubSpot form.
+            // If you create custom HubSpot properties (ai_readiness_score, ai_readiness_tier,
+            // ai_readiness_area_scores, ai_readiness_details) and add them to the form,
+            // move these into the fields[] array instead.
+            payload.fields.push(
+                { objectTypeId: '0-1', name: 'ai_readiness_score',       value: String(formData.get('ai_readiness_score') || '') },
+                { objectTypeId: '0-1', name: 'ai_readiness_tier',        value: formData.get('ai_readiness_tier') || '' },
+                { objectTypeId: '0-1', name: 'ai_readiness_area_scores', value: areaScoreSummary },
+                { objectTypeId: '0-1', name: 'ai_readiness_details',     value: individualScoreSummary }
+            );
+
+            try {
+                const res = await fetch(
+                    `https://api.hsforms.com/submissions/v3/integration/submit/${HS_PORTAL_ID}/${HS_FORM_ID}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                if (!res.ok) {
+                    // HubSpot returns 400 if unknown fields are submitted;
+                    // strip custom fields and retry with just the standard ones
+                    const errBody = await res.json().catch(() => ({}));
+                    console.warn('HubSpot submission warning:', errBody);
+
+                    // Retry with only standard contact fields
+                    const fallback = {
+                        fields: payload.fields.filter(f =>
+                            ['firstname', 'lastname', 'email', 'company'].includes(f.name)
+                        ),
+                        context: payload.context
+                    };
+
+                    const retry = await fetch(
+                        `https://api.hsforms.com/submissions/v3/integration/submit/${HS_PORTAL_ID}/${HS_FORM_ID}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(fallback)
+                        }
+                    );
+
+                    if (!retry.ok) {
+                        throw new Error('HubSpot submission failed');
+                    }
+                }
+
+                // Success — crossfade form → thank you
+                leadForm.classList.add('exit');
+                ctaSubtitle.classList.add('hidden');
+
+                // After form fades out, swap to thank-you
+                setTimeout(() => {
+                    leadForm.classList.add('hidden');
+                    leadForm.classList.remove('exit');
+                    leadThankYou.classList.add('enter');
+                    // Force reflow so transition triggers
+                    void leadThankYou.offsetHeight;
+                    leadThankYou.classList.add('show');
+                }, 450);
+
+            } catch (err) {
+                console.error('Form submission error:', err);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    Try Again
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>`;
+                // Brief visual error feedback
+                submitBtn.style.background = 'var(--red)';
+                submitBtn.style.boxShadow = '0 0 20px var(--red-glow)';
+                setTimeout(() => {
+                    submitBtn.style.background = '';
+                    submitBtn.style.boxShadow = '';
+                }, 2000);
+            }
+        });
+
+        // ─── Retake Button ───
+        document.getElementById('retakeBtn').addEventListener('click', function() {
+            // Reset all state
+            answers = new Array(10).fill(null);
+            currentSlide = 0;
+            transitioning = false;
+
+            // Reset form UI
+            leadForm.reset();
+            leadForm.classList.remove('hidden', 'exit');
+            ctaSubtitle.classList.remove('hidden');
+            leadThankYou.classList.remove('enter', 'show');
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+                Get Your Action Plan
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>`;
+
+            // Reset score ring
+            document.getElementById('ringFill').style.strokeDashoffset = '452';
+            document.getElementById('ringGlow').style.strokeDashoffset = '452';
+            document.getElementById('scoreValue').textContent = '0';
+
+            // Reset all scale button selections
+            document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected', 'ripple'));
+
+            // Reset animations
+            document.querySelectorAll('.animate-in').forEach(el => el.classList.remove('visible'));
+
+            // Reset background orb
+            document.getElementById('bgOrb3').style.opacity = '0';
+
+            // Snap all slides to initial state, then go to welcome
+            allSlides.forEach(s => {
+                s.classList.remove('active', 'exit-up', 'exit-down');
+                s.style.transform = '';
+                s.style.opacity = '';
+            });
+            allSlides[0].classList.add('active');
+            updateUI();
+        });
+
+        // ─── Touch Support ───
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            const diff = touchStartY - touchEndY;
+
+            if (Math.abs(diff) < 50) return; // Minimum swipe distance
+
+            if (currentSlide >= 1 && currentSlide <= 10) {
+                const qi = currentSlide - 1;
+                if (diff > 0 && answers[qi] !== null) {
+                    // Swipe up → next
+                    if (currentSlide < 10) {
+                        goToSlide(currentSlide + 1, 'up');
+                    } else {
+                        goToSlide(11, 'up');
+                    }
+                } else if (diff < 0 && currentSlide > 1) {
+                    // Swipe down → prev
+                    goToSlide(currentSlide - 1, 'down');
+                }
+            }
+        }, { passive: true });
+
+    })();
+    </script>
+</body>
+</html>
